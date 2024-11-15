@@ -1,32 +1,43 @@
-package com.cg.prestmt;
+package com.cg.demo;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
+
+import org.apache.log4j.Logger;
 
 public class LoginDAO {
 
-	private final String driver = "com.mysql.cj.jdbc.Driver";
-	private final String url = "jdbc:mysql://localhost:3306/demo";
-	private final String username = "root";
-	private final String password = "root";
+//	private final String driver = "com.mysql.cj.jdbc.Driver";
+//	private final String url = "jdbc:mysql://localhost:3306/demo";
+//	private final String username = "root";
+//	private final String password = "root";
 
 	private final String listQuery = "SELECT * FROM login";
 
 	private Connection conn = null;
 	private PreparedStatement stmt = null;
+	Logger log = Main.log;
 
 	public List<Login> findAll() {
+		log.info("LoginDAO::findAll() Entered...");
 		try {
 			stmt = getConnection().prepareStatement(listQuery);
 //			System.out.println("Statement created...");
 		} catch (SQLException e) {
-			System.out.println("Unable to create Statement " + e.getErrorCode());
+			log.debug("LoginDAO::findAll() - Unable to create Statement");
+			log.debug(e);
+//			System.out.println("Unable to create Statement " + e.getErrorCode());
 		}
 
 		ResultSet result = null;
@@ -49,6 +60,8 @@ public class LoginDAO {
 		} catch (SQLException e) {
 			System.out.println("Unable to iterate the reult set " + e.getErrorCode());
 		}
+		log.info("return " + list);
+		log.info("LoginDAO::findAll() Exit...");
 		return list;
 	}
 
@@ -178,6 +191,23 @@ public class LoginDAO {
 	}
 
 	private Connection getConnection() {
+		Properties prop = new Properties();
+		FileInputStream in = null;
+		try {
+			in = new FileInputStream("db.properties");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		try {
+			prop.load(in);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String driver = prop.getProperty("driverName");
+		String url = prop.getProperty("url");
+		String username = prop.getProperty("username");
+		String password = prop.getProperty("password");
 		try {
 			Class.forName(driver);
 //			System.out.println("Database Driver registered...");

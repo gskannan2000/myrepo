@@ -16,6 +16,9 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+/*
+* author : Kannan G S
+*/
 public class LoginDAO {
 
 //	private final String driver = "com.mysql.cj.jdbc.Driver";
